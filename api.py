@@ -40,12 +40,10 @@ GET_USER_MATCH_REQUEST = endpoints.ResourceContainer(
 ROCK = 'rock'
 PAPER = 'paper'
 SCISSORS = 'scissors'
-DRAW = 'draw'
 
 @endpoints.api(name='LimitedRockPaperScissors', version='v1')
 class LimitedRPSApi(remote.Service):
     """Game API"""
-
     @endpoints.method(request_message=USER_REQUEST,
                       response_message=StringMessage,
                       path='create_user',
@@ -146,24 +144,10 @@ class LimitedRPSApi(remote.Service):
         match = game.key.parent().get()
 
         return StringMessage(message='Found game between {} and {} with key {}'
-                                     '. {} '
-                                     # '{}\'s cards remain Rock {} : Paper {} : '
-                                     # 'Scissors {}. '
-                                     # '{}\'s cards remain Rock {} : Paper {} : '
-                                     # 'Scissors {}.'
-                                                    .format(match.player_1_name,
-                                                           match.player_2_name,
-                                                           request.game_key,
-                                                           game.result,
-                                                           # match.player_1_name,
-                                                           # match.player_1_rock,
-                                                           # match.player_1_paper,
-                                                           # match.player_1_scissors,
-                                                           # match.player_2_name,
-                                                           # match.player_2_rock,
-                                                           # match.player_2_paper,
-                                                           # match.player_2_scissors
-                                                            ))
+                                     '. {} '.format(match.player_1_name,
+                                                    match.player_2_name,
+                                                    request.game_key,
+                                                    game.result))
 
     @endpoints.method(request_message=PLAY_GAME_REQUEST,
                       response_message=StringMessage,
