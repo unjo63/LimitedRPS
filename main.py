@@ -6,34 +6,34 @@ cronjobs."""
 import webapp2
 from google.appengine.api import mail, app_identity
 from google.appengine.ext import ndb
-from models import User, Match
+from models import User, Game
 
 
 class SendReminderEmail(webapp2.RequestHandler):
     def get(self):
-        """Send a reminder email to each User with active Matches.
+        """Send a reminder email to each User with active Games.
         Called every hour using a cron job"""
         app_id = app_identity.get_application_id()
         users = User.query(User.email != None)
 
         for user in users:
-            matches = Match.query(ndb.AND(Match.is_active == True,
+            games = Game.query(ndb.AND(Game.is_active == True,
                                           ndb.OR(
-                                              Match.player_1_name == user.name,
-                                              Match.player_2_name == user.name)
+                                              Game.player_1_name == user.name,
+                                              Game.player_2_name == user.name)
                                           )).fetch()
 
-            if matches:
-                subject = 'Unfinished match reminder!'
-                body = 'Hello {}, \n\nThe following matches are still in ' \
+            if games:
+                subject = 'Unfinished game reminder!'
+                body = 'Hello {}, \n\nThe following games are still in ' \
                        'progress:\n'.format(user.name)
-                html = 'Hello {}, <br><br>The following matches are still in ' \
+                html = 'Hello {}, <br><br>The following games are still in ' \
                        'progress:<br>'.format(user.name)
-                for match in matches:
-                    body += '{} vs {}\n'.format(match.player_1_name,
-                                                match.player_2_name)
-                    html += '{} vs {}<br>'.format(match.player_1_name,
-                                                  match.player_2_name)
+                for game in games:
+                    body += '{} vs {}\n'.format(game.player_1_name,
+                                                game.player_2_name)
+                    html += '{} vs {}<br>'.format(game.player_1_name,
+                                                  game.player_2_name)
                 body += 'https://{}.appspot.com">Continue playing'\
                     .format(app_id)
                 html += '<a href="https://{}.appspot.com">Continue playing' \
