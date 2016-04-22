@@ -164,87 +164,100 @@ class LimitedRPSApi(remote.Service):
         # Save single player's move. Players can choose
         # rock, paper or scissors from the cards remaining.
         if game.player_1_name == request.player_name:
-            if request.move == ROCK and game.player_1_rock < 1:
-                raise endpoints.ConflictException(
-                    '{}\'s Rock card does not remain. Choose another '
-                    'type of card.'.format(request.player_name))
-            elif request.move == PAPER and game.player_1_paper < 1:
-                raise endpoints.ConflictException(
-                    '{}\'s Paper card does not remain. Choose another '
-                    'type of card.'.format(request.player_name))
-            elif request.move == SCISSORS and game.player_1_scissors < 1:
-                raise endpoints.ConflictException(
-                    '{}\'s Scissors card does not remain. Choose another '
-                    'type of card.'.format(request.player_name))
-            elif not (request.move == ROCK) or not (request.move == PAPER) or not (request.move == SCISSORS):
-                raise endpoints.ConflictException(
-                    '1{} chose a card we don\'t know about. You have to '
-                    'choose rock or paper or scissors. Try to choose a '
-                    'card again.'.format(request.player_name))
+            if game.player_1_move == None:
+                if request.move == ROCK:
+                    if game.player_1_rock < 1:
+                        raise endpoints.ConflictException(
+                            '{}\'s Rock card does not remain. Choose another '
+                            'type of card.'.format(request.player_name))
+                    else:
+                        game.player_1_move = request.move
+                        game.player_1_rock -= 1
+                elif request.move == PAPER:
+                    if game.player_1_paper < 1:
+                        raise endpoints.ConflictException(
+                            '{}\'s Paper card does not remain. Choose another '
+                            'type of card.'.format(request.player_name))
+                    else:
+                        game.player_1_move = request.move
+                        game.player_1_paper -= 1
+                elif request.move == SCISSORS:
+                    if game.player_1_scissors < 1:
+                        raise endpoints.ConflictException(
+                            '{}\'s Scissors card does not remain. Choose another '
+                            'type of card.'.format(request.player_name))
+                    else:
+                        game.player_1_move = request.move
+                        game.player_1_scissors -= 1
+                else:
+                    raise endpoints.ConflictException(
+                        '{} chose a card we don\'t know about. You have to '
+                        'choose rock or paper or scissors. Try to choose a '
+                        'card again.'.format(request.player_name))
             else:
-                game.player_1_move = request.move
+                raise endpoints.ConflictException(
+                    '{} already used a {} card. Please wait to {}\'s move.'
+                        .format(request.player_name, game.player_1_move, game.player_2_name))
         elif game.player_2_name == request.player_name:
-            if request.move == ROCK and game.player_2_rock < 1:
-                raise endpoints.ConflictException(
-                    '{}\'s Rock card does not remain. Choose another '
-                    'type of card.'.format(request.player_name))
-            elif request.move == PAPER and game.player_2_paper < 1:
-                raise endpoints.ConflictException(
-                    '{}\'s Paper card does not remain. Choose another '
-                    'type of card.'.format(request.player_name))
-            elif request.move == SCISSORS and game.player_2_scissors < 1:
-                raise endpoints.ConflictException(
-                    '{}\'s Scissors card does not remain. Choose another '
-                    'type of card.'.format(request.player_name))
-            elif not (request.move == ROCK or request.move == PAPER or request.move == SCISSORS):
-                raise endpoints.ConflictException(
-                    '2{} chose a card we don\'t know about. You have to '
-                    'choose rock or paper or scissors. Try to choose a '
-                    'card again.'.format(request.player_name))
+            if game.player_2_move == None:
+                if request.move == ROCK:
+                    if game.player_2_rock < 1:
+                        raise endpoints.ConflictException(
+                            '{}\'s Rock card does not remain. Choose another '
+                            'type of card.'.format(request.player_name))
+                    else:
+                        game.player_2_move = request.move
+                        game.player_2_rock -= 1
+                elif request.move == PAPER:
+                    if game.player_2_paper < 1:
+                        raise endpoints.ConflictException(
+                            '{}\'s Paper card does not remain. Choose another '
+                            'type of card.'.format(request.player_name))
+                    else:
+                        game.player_2_move = request.move
+                        game.player_2_paper -= 1
+                elif request.move == SCISSORS:
+                    if game.player_2_scissors < 1:
+                        raise endpoints.ConflictException(
+                            '{}\'s Scissors card does not remain. Choose another '
+                            'type of card.'.format(request.player_name))
+                    else:
+                        game.player_2_move = request.move
+                        game.player_2_scissors -= 1
+                else:
+                    raise endpoints.ConflictException(
+                        '{} chose a card we don\'t know about. You have to '
+                        'choose rock or paper or scissors. Try to choose a '
+                        'card again.'.format(request.player_name))
             else:
-                game.player_2_move = request.move
-        else:
-            raise endpoints.ConflictException('Player {} is not playing in '
-                                              'game {}'.
-                                              format(request.player_name,
-                                                     request.game_key))
+                raise endpoints.ConflictException(
+                    '{} already used a {} card. Please wait to {}\'s move.'
+                        .format(request.player_name, game.player_2_move, game.player_1_name))
         game.put()
 
         # Evaluate result and update Game and Match if game has finished
         if game.player_1_move is not None \
                 and game.player_2_move is not None:
             if game.player_1_move == ROCK:
-                game.player_1_rock -= 1
                 if game.player_2_move == ROCK:
-                    game.player_2_rock -= 1
                     game_winner = 0                 #draw
                 elif game.player_2_move == PAPER:
-                    game.player_2_paper -= 1
                     game_winner = 2                 #winner is player_2
                 else:
-                    game.player_2_scissors -= 1
                     game_winner = 1                 #winner is player_1
             elif game.player_1_move == PAPER:
-                game.player_1_paper -= 1
                 if game.player_2_move == ROCK:
-                    game.player_2_rock -= 1
                     game_winner = 1
                 elif game.player_2_move == PAPER:
-                    game.player_2_paper -= 1
                     game_winner = 0
                 else:
-                    game.player_2_scissors -= 1
                     game_winner = 2
             else:
-                game.player_1_scissors -= 1
                 if game.player_2_move == ROCK:
-                    game.player_2_rock -= 1
                     game_winner = 2
                 elif game.player_2_move == PAPER:
-                    game.player_2_paper -= 1
                     game_winner = 1
                 else:
-                    game.player_2_scissors -= 1
                     game_winner = 0
             if game_winner == 1:
                 game.roundresult = "Round result: Winer:{}, Loser:{}.".format(
@@ -256,9 +269,9 @@ class LimitedRPSApi(remote.Service):
                 game.player_2_roundscore += 1
             else:
                 game.roundresult = "Round result: Draw."
-            game.is_active = False
-            game.put()
 
+            game.player_1_move=None
+            game.player_2_move=None
             game.games_remain -= 1
             game.put()
 
@@ -280,7 +293,7 @@ class LimitedRPSApi(remote.Service):
                 loser.lose += 1
                 winner.put()
                 loser.put()
-                game_result = 'Game finished. Winner:{}, Loser:{}.'.format(
+                game_result = 'Game finished. Game result Winner:{}, Loser:{}.'.format(
                     winner_name, loser_name)
             else:
                 draw1 = User.query(User.name == game.player_1_name).get()
@@ -289,7 +302,7 @@ class LimitedRPSApi(remote.Service):
                 draw2.draw += 1
                 draw1.put()
                 draw2.put()
-                game_result = 'Game finished. Result is Draw.'
+                game_result = 'Game finished. Game result is Draw.'
         else:
             game_result = 'Game still in progress.'
 
@@ -298,7 +311,7 @@ class LimitedRPSApi(remote.Service):
                                      '{}\'s cards remain Rock {} : Paper {} : '
                                      'Scissors {}. '
                                      '{}\'s cards remain Rock {} : Paper {} : '
-                                     'Scissors {}.'.
+                                     'Scissors {}. Rounds remain {}'.
                              format(request.player_name,
                                     request.move,
                                     request.game_key,
@@ -311,7 +324,8 @@ class LimitedRPSApi(remote.Service):
                                     game.player_2_name,
                                     game.player_2_rock,
                                     game.player_2_paper,
-                                    game.player_2_scissors))
+                                    game.player_2_scissors,
+                                    game.games_remain))
 
     @endpoints.method(request_message=GET_USER_GAME_REQUEST,
                       response_message=StringMessages,
