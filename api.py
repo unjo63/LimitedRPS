@@ -89,7 +89,7 @@ class LimitedRPSApi(remote.Service):
                     games_remain=9,
                     start_time=datetime.now(),
                     is_active=True,
-                    roundresult='Not all players have played yet.'
+                    roundresult='Not all players have played yet.')
 
         game_key = game.put()
         return StringMessage(message='Game created! {}\'s cards (Rock{} : '
@@ -166,41 +166,41 @@ class LimitedRPSApi(remote.Service):
         if game.player_1_name == request.player_name:
             if request.move == ROCK and game.player_1_rock < 1:
                 raise endpoints.ConflictException(
-                    'Your Rock card does not remain. Choose another '
-                    'type of card.')
+                    '{}\'s Rock card does not remain. Choose another '
+                    'type of card.'.format(request.player_name))
             elif request.move == PAPER and game.player_1_paper < 1:
                 raise endpoints.ConflictException(
-                    'Your Paper card does not remain. Choose another '
-                    'type of card.')
+                    '{}\'s Paper card does not remain. Choose another '
+                    'type of card.'.format(request.player_name))
             elif request.move == SCISSORS and game.player_1_scissors < 1:
                 raise endpoints.ConflictException(
-                    'Your Scissors card does not remain. Choose another '
-                    'type of card.')
+                    '{}\'s Scissors card does not remain. Choose another '
+                    'type of card.'.format(request.player_name))
             elif not (request.move == ROCK) or not (request.move == PAPER) or not (request.move == SCISSORS):
                 raise endpoints.ConflictException(
-                    'You chose a card we don\'t know about. You have to '
+                    '1{} chose a card we don\'t know about. You have to '
                     'choose rock or paper or scissors. Try to choose a '
-                    'card again.')
+                    'card again.'.format(request.player_name))
             else:
                 game.player_1_move = request.move
         elif game.player_2_name == request.player_name:
             if request.move == ROCK and game.player_2_rock < 1:
                 raise endpoints.ConflictException(
-                    'Your Rock card does not remain. Choose another '
-                    'type of card.')
+                    '{}\'s Rock card does not remain. Choose another '
+                    'type of card.'.format(request.player_name))
             elif request.move == PAPER and game.player_2_paper < 1:
                 raise endpoints.ConflictException(
-                    'Your Paper card does not remain. Choose another '
-                    'type of card.')
+                    '{}\'s Paper card does not remain. Choose another '
+                    'type of card.'.format(request.player_name))
             elif request.move == SCISSORS and game.player_2_scissors < 1:
                 raise endpoints.ConflictException(
-                    'Your Scissors card does not remain. Choose another '
-                    'type of card.')
+                    '{}\'s Scissors card does not remain. Choose another '
+                    'type of card.'.format(request.player_name))
             elif not (request.move == ROCK or request.move == PAPER or request.move == SCISSORS):
                 raise endpoints.ConflictException(
-                    'You chose a card we don\'t know about. You have to '
+                    '2{} chose a card we don\'t know about. You have to '
                     'choose rock or paper or scissors. Try to choose a '
-                    'card again.')
+                    'card again.'.format(request.player_name))
             else:
                 game.player_2_move = request.move
         else:
@@ -386,3 +386,4 @@ class LimitedRPSApi(remote.Service):
         return StringMessages(message=[user.name for user in active_users])
 
 api = endpoints.api_server([LimitedRPSApi])
+
