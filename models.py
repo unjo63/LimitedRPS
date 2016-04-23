@@ -10,15 +10,15 @@ class User(ndb.Model):
     """User profile"""
     name = ndb.StringProperty(required=True)
     email = ndb.StringProperty(required=True)
-    win = ndb.IntegerProperty(required=True)  # Number of win games
-    lose = ndb.IntegerProperty(required=True)  # Number of lose games
-    draw = ndb.IntegerProperty(required=True)  # Number of draw games
+    win = ndb.IntegerProperty()  # Number of win games
+    lose = ndb.IntegerProperty()  # Number of lose games
+    draw = ndb.IntegerProperty()  # Number of draw games
 
 
 class Game(ndb.Model):
     """Game"""
-    player_1_name = ndb.StringProperty()
-    player_2_name = ndb.StringProperty()
+    player_1_name = ndb.StringProperty(required=True)
+    player_2_name = ndb.StringProperty(required=True)
     player_1_rock=ndb.IntegerProperty()  # Number of P1 rock cards
     player_1_paper=ndb.IntegerProperty()  # Number of P1 paper cards
     player_1_scissors=ndb.IntegerProperty()  # Number of P1 scissors cards
