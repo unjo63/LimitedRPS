@@ -92,10 +92,10 @@ class LimitedRPSApi(remote.Service):
                     roundresult='Not all players have played yet.')
 
         game_key = game.put()
-        return StringMessage(message='Game created!\n'
-                                     '{}\'s cards remain (Rock{} : Paper{} : Scissors{}).\n'
-                                     '{}\'s cards (Rock{} : Paper{} : Scissors{}).\n'
-                                     '{} rounds have been finished.\n'
+        return StringMessage(message='Game created! '
+                                     '{}\'s cards remain (Rock{} : Paper{} : Scissors{}). '
+                                     '{}\'s cards (Rock{} : Paper{} : Scissors{}). '
+                                     '{} rounds have been finished. '
                                      '(key={})'.format(request.player_1_name, game.player_1_rock,
                                                        game.player_1_paper, game.player_1_scissors,
                                                        request.player_2_name, game.player_2_rock,
@@ -116,10 +116,10 @@ class LimitedRPSApi(remote.Service):
             raise endpoints.ConflictException('Cannot find game with key {}'.
                                               format(request.game_key))
 
-        return StringMessage(message='Found game between {} and {}.\n'
-                                     '(key={})\n'
-                                     '{}\n'
-                                     '{}\'s cards remain (Rock{} : Paper{} : Scissors{})\n'
+        return StringMessage(message='Found game between {} and {}. '
+                                     '(key={}) '
+                                     '{} '
+                                     '{}\'s cards remain (Rock{} : Paper{} : Scissors{}). '
                                      '{}\'s cards remain (Rock{} : Paper{} : Scissors{}).'
                                             .format(game.player_1_name,
                                                     game.player_2_name,
@@ -267,15 +267,15 @@ class LimitedRPSApi(remote.Service):
                 else:
                     game_winner = 0
             if game_winner == 1:
-                game.roundresult = "Round result: Winer:{}, Loser:{}."\
-                    .format(game.player_1_name, game.player_2_name)
+                game.roundresult = ('Round result: Winer:{}, Loser:{}.'
+                    .format(game.player_1_name, game.player_2_name))
                 game.player_1_roundscore += 1
             elif game_winner == 2:
-                game.roundresult = "Round result: Winer:{}, Loser:{}."\
-                    .format(game.player_2_name, game.player_1_name)
+                game.roundresult = ('Round result: Winer:{}, Loser:{}.'
+                    .format(game.player_2_name, game.player_1_name))
                 game.player_2_roundscore += 1
             else:
-                game.roundresult = "Round result: Draw."
+                game.roundresult = ('Round result: Draw.')
 
             game.player_1_move=None
             game.player_2_move=None
@@ -300,8 +300,8 @@ class LimitedRPSApi(remote.Service):
                 loser.lose += 1
                 winner.put()
                 loser.put()
-                game_result = 'Game finished. Game result Winner:{}, Loser:{}.'\
-                    .format(winner_name, loser_name)
+                game_result = ('Game finished. Game result Winner:{}, Loser:{}.'
+                    .format(winner_name, loser_name))
             else:
                 draw1 = User.query(User.name == game.player_1_name).get()
                 draw2 = User.query(User.name == game.player_2_name).get()
@@ -313,11 +313,11 @@ class LimitedRPSApi(remote.Service):
         else:
             game_result = 'Game still in progress.'
 
-        return StringMessage(message='{} played {}\'s card in this round.\n'
-                                     '(key={})\n'
-                                     '{}\n{}\n'
-                                     '{}\'s cards remain (Rock{} : Paper{} : Scissors{}).\n'
-                                     '{}\'s cards remain (Rock{} : Paper{} : Scissors{}).\n'
+        return StringMessage(message='{} played {}\'s card in this round. '
+                                     '(key={}) '
+                                     '{} {} '
+                                     '{}\'s cards remain (Rock{} : Paper{} : Scissors{}). '
+                                     '{}\'s cards remain (Rock{} : Paper{} : Scissors{}). '
                                      '{} rounds have been finished.'
                              .format(request.player_name,
                                     request.move,
