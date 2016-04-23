@@ -10,29 +10,31 @@ class User(ndb.Model):
     """User profile"""
     name = ndb.StringProperty(required=True)
     email = ndb.StringProperty(required=True)
-    win = ndb.IntegerProperty(required=True)  # Number of wins
-    lose = ndb.IntegerProperty(required=True)  # Number of losses
-    draw = ndb.IntegerProperty(required=True)  # Number of draws
+    win = ndb.IntegerProperty(required=True)  # Number of win games
+    lose = ndb.IntegerProperty(required=True)  # Number of lose games
+    draw = ndb.IntegerProperty(required=True)  # Number of draw games
 
 
 class Game(ndb.Model):
     """Game"""
     player_1_name = ndb.StringProperty()
     player_2_name = ndb.StringProperty()
-    player_1_rock=ndb.IntegerProperty()
-    player_1_paper=ndb.IntegerProperty()
-    player_1_scissors=ndb.IntegerProperty()
-    player_2_rock=ndb.IntegerProperty()
-    player_2_paper=ndb.IntegerProperty()
-    player_2_scissors=ndb.IntegerProperty()
-    player_1_roundscore=ndb.IntegerProperty()
-    player_2_roundscore=ndb.IntegerProperty()
-    round=ndb.IntegerProperty()
+    player_1_rock=ndb.IntegerProperty()  # Number of P1 rock cards
+    player_1_paper=ndb.IntegerProperty()  # Number of P1 paper cards
+    player_1_scissors=ndb.IntegerProperty()  # Number of P1 scissors cards
+    player_2_rock=ndb.IntegerProperty()  # Number of P2 rock cards
+    player_2_paper=ndb.IntegerProperty()  # Number of P2 paper cards
+    player_2_scissors=ndb.IntegerProperty()  # Number of P2 scissors cards
+    player_1_round_score=ndb.IntegerProperty()
+    # Number of rounds P1 wins in the game
+    player_2_round_score=ndb.IntegerProperty()
+    # Number of rounds P2 wins in the game
+    round=ndb.IntegerProperty()  # Number of played rounds
     player_1_move = ndb.StringProperty()  # rock or paper or scissors
     player_2_move = ndb.StringProperty()  # rock or paper or scissors
     is_active = ndb.BooleanProperty()
     start_time = ndb.DateTimeProperty()
-    roundresult = ndb.StringProperty()  # Result of game round
+    round_result = ndb.StringProperty()  # Result of round
 
 
 class StringMessage(messages.Message):
