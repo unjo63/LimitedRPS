@@ -27,7 +27,7 @@ class Game(ndb.Model):
     player_2_scissors=ndb.IntegerProperty()
     player_1_roundscore=ndb.IntegerProperty()
     player_2_roundscore=ndb.IntegerProperty()
-    games_remain=ndb.IntegerProperty()
+    round=ndb.IntegerProperty()
     player_1_move = ndb.StringProperty()  # rock or paper or scissors
     player_2_move = ndb.StringProperty()  # rock or paper or scissors
     is_active = ndb.BooleanProperty()

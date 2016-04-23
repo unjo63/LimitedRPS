@@ -86,21 +86,21 @@ class LimitedRPSApi(remote.Service):
                     player_2_scissors=3,
                     player_1_roundscore=0,
                     player_2_roundscore=0,
-                    games_remain=9,
+                    round=0,
                     start_time=datetime.now(),
                     is_active=True,
                     roundresult='Not all players have played yet.')
 
         game_key = game.put()
-        return StringMessage(message='Game created! {}\'s cards (Rock{} : '
-                                     'Paper{} : Scissors{})'
-                                     ' {}\'s (Rock{} : Paper{} : Scissors{}) '
-                                     'Game round remain : {}'
+        return StringMessage(message='Game created!\n'
+                                     '{}\'s cards remain (Rock{} : Paper{} : Scissors{}).\n'
+                                     '{}\'s cards (Rock{} : Paper{} : Scissors{}).\n'
+                                     '{} rounds have been finished.\n'
                                      '(key={})'.format(request.player_1_name, game.player_1_rock,
                                                        game.player_1_paper, game.player_1_scissors,
                                                        request.player_2_name, game.player_2_rock,
                                                        game.player_2_paper, game.player_2_scissors,
-                                                       game.games_remain,
+                                                       game.round,
                                                        game_key.urlsafe()))
 
     @endpoints.method(request_message=GET_GAME_REQUEST,
@@ -116,11 +116,12 @@ class LimitedRPSApi(remote.Service):
             raise endpoints.ConflictException('Cannot find game with key {}'.
                                               format(request.game_key))
 
-        return StringMessage(message='Found game between {} and {} with key {}.'
-                                     '. {} {}\'s cards remain Rock {} : Paper {} : '
-                                     'Scissors {}. '
-                                     '{}\'s cards remain Rock {} : Paper {} : '
-                                     'Scissors {}. '.format(game.player_1_name,
+        return StringMessage(message='Found game between {} and {}.\n'
+                                     '(key={})\n'
+                                     '{}\n'
+                                     '{}\'s cards remain (Rock{} : Paper{} : Scissors{})\n'
+                                     '{}\'s cards remain (Rock{} : Paper{} : Scissors{}).'
+                                            .format(game.player_1_name,
                                                     game.player_2_name,
                                                     request.game_key,
                                                     game.roundresult,
@@ -168,31 +169,34 @@ class LimitedRPSApi(remote.Service):
                 if request.move == ROCK:
                     if game.player_1_rock < 1:
                         raise endpoints.ConflictException(
-                            '{}\'s Rock card does not remain. Choose another '
-                            'type of card.'.format(request.player_name))
+                            '{}\'s rock card does not remain. '
+                            'Choose another type of card.'
+                                .format(request.player_name))
                     else:
                         game.player_1_move = request.move
                         game.player_1_rock -= 1
                 elif request.move == PAPER:
                     if game.player_1_paper < 1:
                         raise endpoints.ConflictException(
-                            '{}\'s Paper card does not remain. Choose another '
-                            'type of card.'.format(request.player_name))
+                            '{}\'s paper card does not remain. '
+                            'Choose another type of card.'
+                                .format(request.player_name))
                     else:
                         game.player_1_move = request.move
                         game.player_1_paper -= 1
                 elif request.move == SCISSORS:
                     if game.player_1_scissors < 1:
                         raise endpoints.ConflictException(
-                            '{}\'s Scissors card does not remain. Choose another '
-                            'type of card.'.format(request.player_name))
+                            '{}\'s scissors card does not remain. '
+                            'Choose another type of card.'
+                                .format(request.player_name))
                     else:
                         game.player_1_move = request.move
                         game.player_1_scissors -= 1
                 else:
                     raise endpoints.ConflictException(
                         '{} chose a card we don\'t know about. You have to '
-                        'choose rock or paper or scissors. Try to choose a '
+                        'choose rock, paper or scissors. Try to choose a '
                         'card again.'.format(request.player_name))
             else:
                 raise endpoints.ConflictException(
@@ -203,31 +207,34 @@ class LimitedRPSApi(remote.Service):
                 if request.move == ROCK:
                     if game.player_2_rock < 1:
                         raise endpoints.ConflictException(
-                            '{}\'s Rock card does not remain. Choose another '
-                            'type of card.'.format(request.player_name))
+                            '{}\'s rock card does not remain. '
+                            'Choose another type of card.'
+                                .format(request.player_name))
                     else:
                         game.player_2_move = request.move
                         game.player_2_rock -= 1
                 elif request.move == PAPER:
                     if game.player_2_paper < 1:
                         raise endpoints.ConflictException(
-                            '{}\'s Paper card does not remain. Choose another '
-                            'type of card.'.format(request.player_name))
+                            '{}\'s paper card does not remain. '
+                            'Choose another type of card.'
+                                .format(request.player_name))
                     else:
                         game.player_2_move = request.move
                         game.player_2_paper -= 1
                 elif request.move == SCISSORS:
                     if game.player_2_scissors < 1:
                         raise endpoints.ConflictException(
-                            '{}\'s Scissors card does not remain. Choose another '
-                            'type of card.'.format(request.player_name))
+                            '{}\'s scissors card does not remain. '
+                            'Choose another type of card.'
+                                .format(request.player_name))
                     else:
                         game.player_2_move = request.move
                         game.player_2_scissors -= 1
                 else:
                     raise endpoints.ConflictException(
                         '{} chose a card we don\'t know about. You have to '
-                        'choose rock or paper or scissors. Try to choose a '
+                        'choose rock, paper or scissors. Try to choose a '
                         'card again.'.format(request.player_name))
             else:
                 raise endpoints.ConflictException(
@@ -260,23 +267,23 @@ class LimitedRPSApi(remote.Service):
                 else:
                     game_winner = 0
             if game_winner == 1:
-                game.roundresult = "Round result: Winer:{}, Loser:{}.".format(
-                game.player_1_name, game.player_2_name)
+                game.roundresult = "Round result: Winer:{}, Loser:{}."\
+                    .format(game.player_1_name, game.player_2_name)
                 game.player_1_roundscore += 1
             elif game_winner == 2:
-                game.roundresult = "Round result: Winer:{}, Loser:{}.".format(
-                game.player_2_name, game.player_1_name)
+                game.roundresult = "Round result: Winer:{}, Loser:{}."\
+                    .format(game.player_2_name, game.player_1_name)
                 game.player_2_roundscore += 1
             else:
                 game.roundresult = "Round result: Draw."
 
             game.player_1_move=None
             game.player_2_move=None
-            game.games_remain -= 1
+            game.round += 1
             game.put()
 
         # Update Game and Users if game has finished
-        if (game.games_remain < 1) or (game.player_1_roundscore > 4) \
+        if (game.round > 8) or (game.player_1_roundscore > 4) \
                 or (game.player_2_roundscore > 4):
             game.is_active = False
             game.put()
@@ -293,8 +300,8 @@ class LimitedRPSApi(remote.Service):
                 loser.lose += 1
                 winner.put()
                 loser.put()
-                game_result = 'Game finished. Game result Winner:{}, Loser:{}.'.format(
-                    winner_name, loser_name)
+                game_result = 'Game finished. Game result Winner:{}, Loser:{}.'\
+                    .format(winner_name, loser_name)
             else:
                 draw1 = User.query(User.name == game.player_1_name).get()
                 draw2 = User.query(User.name == game.player_2_name).get()
@@ -306,13 +313,13 @@ class LimitedRPSApi(remote.Service):
         else:
             game_result = 'Game still in progress.'
 
-        return StringMessage(message='{} play {}\'s card in this round of '
-                                     'the game {}. {} {} '
-                                     '{}\'s cards remain Rock {} : Paper {} : '
-                                     'Scissors {}. '
-                                     '{}\'s cards remain Rock {} : Paper {} : '
-                                     'Scissors {}. Rounds remain {}'.
-                             format(request.player_name,
+        return StringMessage(message='{} played {}\'s card in this round.\n'
+                                     '(key={})\n'
+                                     '{}\n{}\n'
+                                     '{}\'s cards remain (Rock{} : Paper{} : Scissors{}).\n'
+                                     '{}\'s cards remain (Rock{} : Paper{} : Scissors{}).\n'
+                                     '{} rounds have been finished.'
+                             .format(request.player_name,
                                     request.move,
                                     request.game_key,
                                     game.roundresult,
@@ -325,7 +332,7 @@ class LimitedRPSApi(remote.Service):
                                     game.player_2_rock,
                                     game.player_2_paper,
                                     game.player_2_scissors,
-                                    game.games_remain))
+                                    game.round))
 
     @endpoints.method(request_message=GET_USER_GAME_REQUEST,
                       response_message=StringMessages,
@@ -356,11 +363,11 @@ class LimitedRPSApi(remote.Service):
         game = get_by_urlsafe(request.game_key, Game)
         if not game:
             raise endpoints.ConflictException('Cannot find game with key {}'.
-                                              format(request.game_key_key))
+                                              format(request.game_key))
         if not game.is_active:
             raise endpoints.ConflictException('Game already inactive')
 
-        game.games_remain = 0
+        game.round = 9
         game.is_active = False
         game.put()
 
