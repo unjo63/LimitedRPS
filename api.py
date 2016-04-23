@@ -66,7 +66,7 @@ class LimitedRPSApi(remote.Service):
                       name='create_game',
                       http_method='POST')
     def create_game(self, request):
-        """Create a Game between two Users)"""
+        """Create a Game between two Users"""
 
         if request.player_1_name == request.player_2_name:
             raise endpoints.ConflictException(
@@ -340,7 +340,7 @@ class LimitedRPSApi(remote.Service):
                       name='get_user_games',
                       http_method='GET')
     def get_user_games(self, request):
-        """Get all active Matches for a User"""
+        """Get all active Games for a User"""
 
         games = Game.query(ndb.AND(Game.is_active == True,
                                       ndb.OR(
@@ -358,7 +358,7 @@ class LimitedRPSApi(remote.Service):
                       name='cancel_game',
                       http_method='POST')
     def cancel_game(self, request):
-        """Cancel an active match"""
+        """Cancel an active game"""
 
         game = get_by_urlsafe(request.game_key, Game)
         if not game:
