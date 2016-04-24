@@ -38,6 +38,7 @@ This backend for an online two player Limited Rock Paper Scissors game has the f
 - Get result of current round in a Game.
 - Get User rankings order by the number of wins.
 - Notify Users of unfinished Games by email (automatically every hour).
+- Get the list of player's move history played in every rounds in a game.
 
 ## Files Included
  - api.py: Contains endpoints and game playing logic.
@@ -107,6 +108,13 @@ This backend for an online two player Limited Rock Paper Scissors game has the f
     - Parameters:
     - Returns: StringMessage containing list of Users in descending order of score
     - Description: *Return list of Users in descending order of score*
+ 
+ - **get_round_history**
+    - Path: 'get_round_history'
+    - Method: GET
+    - Parameters: game_key
+    - Returns: StringMessage containing list of move of every rounds plays in Game
+    - Description: *Return list of moves play in Game*
     
  - **get_active_users**
     - Path: 'get_active_users'

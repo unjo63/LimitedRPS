@@ -39,6 +39,7 @@ class Game(ndb.Model):
 
 
 class PlayerMoves(ndb.Model):
+    """Record player's move play in round"""
     player_1_move = ndb.StringProperty()
     player_2_move = ndb.StringProperty()
     round = ndb.IntegerProperty()

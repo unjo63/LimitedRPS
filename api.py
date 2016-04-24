@@ -307,8 +307,6 @@ class LimitedRPSApi(remote.Service):
             game.player_2_move = None
             game.put()
 
-
-
         # Update Game and Users if game has finished
         if (game.round > 8) or (game.player_1_round_score > 4) \
                 or (game.player_2_round_score > 4):
@@ -430,7 +428,7 @@ class LimitedRPSApi(remote.Service):
                       name='get_round_history',
                       http_method='GET')
     def get_round_history(self, request):
-        """Return list of Rounds plays in Game"""
+        """Return list of moves play in Game"""
 
         game = get_by_urlsafe(request.game_key, Game)
         if not game:
@@ -440,11 +438,11 @@ class LimitedRPSApi(remote.Service):
         moves = PlayerMoves.query(ancestor=game.key).order(PlayerMoves.round)
 
         return StringMessages(message=[
-            'Round {}, {}:{}, {}:{}. {}'.format(move.round,
-                                                game.player_1_name,
-                                                move.player_1_move,
-                                                game.player_2_name,
-                                                move.player_2_move
-                                                ) for move in moves])
+            'Round {}, {}:{}, {}:{}.'.format(move.round,
+                                             game.player_1_name,
+                                             move.player_1_move,
+                                             game.player_2_name,
+                                             move.player_2_move
+                                             ) for move in moves])
 
 api = endpoints.api_server([LimitedRPSApi])
