@@ -16,24 +16,23 @@ class User(ndb.Model):
 
 
 class Game(ndb.Model):
-    """Game"""
+    """Game with players name and cards remain."""
     player_1_name = ndb.StringProperty(required=True)
     player_2_name = ndb.StringProperty(required=True)
-    player_1_rock=ndb.IntegerProperty()  # Number of P1 rock cards
-    player_1_paper=ndb.IntegerProperty()  # Number of P1 paper cards
-    player_1_scissors=ndb.IntegerProperty()  # Number of P1 scissors cards
-    player_2_rock=ndb.IntegerProperty()  # Number of P2 rock cards
-    player_2_paper=ndb.IntegerProperty()  # Number of P2 paper cards
-    player_2_scissors=ndb.IntegerProperty()  # Number of P2 scissors cards
-    player_1_round_score=ndb.IntegerProperty()
+    player_1_rock = ndb.IntegerProperty()  # Number of P1's rock cards
+    player_1_paper = ndb.IntegerProperty()  # Number of P1's paper cards
+    player_1_scissors = ndb.IntegerProperty()  # Number of P1's scissors cards
+    player_2_rock = ndb.IntegerProperty()  # Number of P2's rock cards
+    player_2_paper = ndb.IntegerProperty()  # Number of P2's paper cards
+    player_2_scissors = ndb.IntegerProperty()  # Number of P2's scissors cards
+    player_1_round_score = ndb.IntegerProperty()
     # Number of rounds P1 wins in the game
-    player_2_round_score=ndb.IntegerProperty()
+    player_2_round_score = ndb.IntegerProperty()
     # Number of rounds P2 wins in the game
-    round=ndb.IntegerProperty()  # Number of played rounds
+    round = ndb.IntegerProperty()  # Number of played rounds in this game
     player_1_move = ndb.StringProperty()  # rock or paper or scissors
     player_2_move = ndb.StringProperty()  # rock or paper or scissors
     is_active = ndb.BooleanProperty()
-    start_time = ndb.DateTimeProperty()
     round_result = ndb.StringProperty()  # Result of round
 
 

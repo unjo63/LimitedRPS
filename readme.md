@@ -39,7 +39,7 @@ This backend for an online two player Limited Rock Paper Scissors game has the f
 - Get User rankings order by the number of wins.
 - Notify Users of unfinished Games by email (automatically every hour).
 
-## Files Included:
+## Files Included
  - api.py: Contains endpoints and game playing logic.
  - app.yaml: App configuration.
  - cron.yaml: Cronjob configuration.
@@ -55,6 +55,7 @@ This backend for an online two player Limited Rock Paper Scissors game has the f
 0. Clone this repository.
 1. Create a new project in your *[Google Cloud Platform Console](https://console.cloud.google.com/)* and copy your application ID to *app.yaml* in place of `limitedrps`.
 2. Deploy your project. (See the [docs](https://cloud.google.com/appengine/docs/python/) for details).
+3. While launching chrome to test API, you will have to launch it using the console as follows: [path-to-Chrome] --user-data-dir=test --unsafely-treat-insecure-origin-as-secure=http://localhost: `port`
 
 ## Endpoints
  - **create_user**
@@ -107,7 +108,7 @@ This backend for an online two player Limited Rock Paper Scissors game has the f
     - Returns: StringMessage containing list of Users in descending order of score
     - Description: *Return list of Users in descending order of score*
     
-   - **get_active_users**
+ - **get_active_users**
     - Path: 'get_active_users'
     - Method: GET
     - Parameters: 

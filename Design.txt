@@ -1,0 +1,33 @@
+Design of LimitedRPS
+
+1. What additional properties did you add to your models and why?
+
+    I added fallowing properties to User class. These property is listed by get_user_rankings endpoint:
+        win = ndb.IntegerProperty()  # Number of win games
+        lose = ndb.IntegerProperty()  # Number of lose games
+        draw = ndb.IntegerProperty()  # Number of draw games
+
+    LimitedRPS has 5~9 rounds par one game, so I added following properties to Game class:
+        player_1_round_score = ndb.IntegerProperty()  # Number of rounds Player_1 wins in the game.
+        player_2_round_score = ndb.IntegerProperty()    # Number of rounds Player_2 wins in the game.
+        round = ndb.IntegerProperty()  # Number of played rounds in this game.
+        is_active = ndb.BooleanProperty()   # True corresponds to this game is active. False corresponds to this game was finished.
+        round_result = ndb.StringProperty()  # Result of this round.
+
+    I also added following properties for record how many card players have:
+        player_1_rock = ndb.IntegerProperty()  # Number of Player_1's rock cards
+        player_1_paper = ndb.IntegerProperty()  # Number of Player_1's paper cards
+        player_1_scissors = ndb.IntegerProperty()  # Number of Player_1's scissors cards
+        player_2_rock = ndb.IntegerProperty()  # Number of Player_2's rock cards
+        player_2_paper = ndb.IntegerProperty()  # Number of Player_2's paper cards
+        player_2_scissors = ndb.IntegerProperty()  # Number of Player_2's scissors cards
+
+2. What were some of the trade-offs or struggles you faced when implementing the new game logic?
+
+    In LimitedRPS players play 5~9 rounds per one game. This API contains play_game() function but play_round() function.
+    The play_game() function contains round function. If there is play_round() apart from play_game() function, players
+    have to register rounds 5~9 times per a game, this logic cause front end code more complex. So I think play_game()
+    contains round function is easier way for implement LimitedRPS game. This logic's disadvantage is the history of every round
+    result in a game is not recorded automatically. If players want to get round result, they use get_game() function,
+    this function returns current round result in a game.
+

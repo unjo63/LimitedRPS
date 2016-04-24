@@ -88,7 +88,6 @@ class LimitedRPSApi(remote.Service):
                     player_1_round_score=0,
                     player_2_round_score=0,
                     round=0,
-                    start_time=datetime.now(),
                     is_active=True,
                     round_result='Not all players have played yet.')
 
@@ -282,12 +281,14 @@ class LimitedRPSApi(remote.Service):
                 else:
                     game_winner = 0
             if game_winner == 1:
-                game.round_result = ('Round result: Winner:{}, Loser:{}.'
-                    .format(game.player_1_name, game.player_2_name))
+                game.round_result = ('Round result: Winner:{}, Loser:{}.'.
+                                     format(game.player_1_name,
+                                            game.player_2_name))
                 game.player_1_round_score += 1
             elif game_winner == 2:
-                game.round_result = ('Round result: Winner:{}, Loser:{}.'
-                    .format(game.player_2_name, game.player_1_name))
+                game.round_result = ('Round result: Winner:{}, Loser:{}.'.
+                                     format(game.player_2_name,
+                                            game.player_1_name))
                 game.player_2_round_score += 1
             else:
                 game.round_result = 'Round result: Draw.'
@@ -337,8 +338,8 @@ class LimitedRPSApi(remote.Service):
                                      '(Rock{} : Paper{} : Scissors{}). '
                                      '{}\'s cards remain '
                                      '(Rock{} : Paper{} : Scissors{}). '
-                                     '{} rounds have been finished.'
-                             .format(request.player_name,
+                                     '{} rounds have been finished.'.
+                             format(request.player_name,
                                      request.move,
                                      request.game_key,
                                      game.round_result,
@@ -425,4 +426,3 @@ class LimitedRPSApi(remote.Service):
         return StringMessages(message=[user.name for user in active_users])
 
 api = endpoints.api_server([LimitedRPSApi])
-
