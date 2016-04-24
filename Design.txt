@@ -3,6 +3,7 @@ Design of LimitedRPS
 1. What additional properties did you add to your models and why?
 
     I added fallowing properties to User class. These property is listed by get_user_rankings endpoint:
+        winning_rate = ndb.FloatProperty()  # Rate of wining games per all finished games
         win = ndb.IntegerProperty()  # Number of win games
         lose = ndb.IntegerProperty()  # Number of lose games
         draw = ndb.IntegerProperty()  # Number of draw games

@@ -14,3 +14,8 @@ indexes:
   ancestor: yes
   properties:
   - name: start_time
+
+- kind: PlayerMoves
+  ancestor: yes
+  properties:
+  - name: round

@@ -9,7 +9,7 @@ from protorpc import remote, messages, message_types
 from google.appengine.api import oauth
 from google.appengine.ext import ndb
 
-from models import User, Game
+from models import User, Game, PlayerMoves
 from models import StringMessage, StringMessages
 from utils import get_by_urlsafe
 
@@ -55,7 +55,8 @@ class LimitedRPSApi(remote.Service):
                 'A User with that name already exists!')
 
         user = User(name=request.user_name,
-                    email=oauth_user.email(), win=0, lose=0, draw=0)
+                    email=oauth_user.email(),
+                    winning_rate=0, win=0, lose=0, draw=0)
         user.put()
         return StringMessage(message='User {} created!'.format(
             request.user_name))
@@ -92,6 +93,7 @@ class LimitedRPSApi(remote.Service):
                     round_result='Not all players have played yet.')
 
         game_key = game.put()
+
         return StringMessage(message='Game created! '
                                      '{}\'s cards remain '
                                      '(Rock{} : Paper{} : Scissors{}). '
@@ -256,7 +258,7 @@ class LimitedRPSApi(remote.Service):
                         game.player_1_name))
         game.put()
 
-        # Evaluate result and update Game and Match if game has finished
+        # Evaluate result and update Game if game has finished
         if game.player_1_move is not None \
                 and game.player_2_move is not None:
             if game.player_1_move == ROCK:
@@ -293,19 +295,28 @@ class LimitedRPSApi(remote.Service):
             else:
                 game.round_result = 'Round result: Draw.'
 
+            game.round += 1
+
+            move = PlayerMoves(parent=game.key,
+                               player_1_move=game.player_1_move,
+                               player_2_move=game.player_2_move,
+                               round=game.round)
+            move_key = move.put()
+
             game.player_1_move = None
             game.player_2_move = None
-            game.round += 1
             game.put()
+
+
 
         # Update Game and Users if game has finished
         if (game.round > 8) or (game.player_1_round_score > 4) \
                 or (game.player_2_round_score > 4):
             game.is_active = False
             game.put()
-            # if not draw
             if game.player_1_round_score != game.player_2_round_score:
-                if game.player_1_round_score < game.player_2_round_score:
+                # if not draw
+                if game.player_1_round_score > game.player_2_round_score:
                     winner_name = game.player_1_name
                     loser_name = game.player_2_name
                 else:
@@ -314,17 +325,21 @@ class LimitedRPSApi(remote.Service):
                 winner = User.query(User.name == winner_name).get()
                 loser = User.query(User.name == loser_name).get()
                 winner.win += 1
+                winner.winning_rate = winner.win/(winner.win+winner.lose+winner.draw)
                 loser.lose += 1
+                loser.winning_rate = loser.win/(loser.win+loser.lose+loser.draw)
                 winner.put()
                 loser.put()
                 game_result = ('Game finished. Game result '
                                'Winner:{}, Loser:{}.'.format(
                                 winner_name, loser_name))
-            else:
+            else: # if draw
                 draw1 = User.query(User.name == game.player_1_name).get()
                 draw2 = User.query(User.name == game.player_2_name).get()
                 draw1.draw += 1
+                draw1.winning_rate = draw1.win/(draw1.win+draw1.lose+draw1.draw)
                 draw2.draw += 1
+                draw2.winning_rate = draw2.win/(draw2.win+draw2.lose+draw2.draw)
                 draw1.put()
                 draw2.put()
                 game_result = 'Game finished. Game result is Draw.'
@@ -361,16 +376,17 @@ class LimitedRPSApi(remote.Service):
                       http_method='GET')
     def get_user_games(self, request):
         """Get all active Games for a User"""
-
-        games = Game.query(ndb.AND(Game.is_active is True,
-                                   ndb.OR(
-                                          Game.player_1_name ==
-                                          request.player_name,
-                                          Game.player_2_name ==
-                                          request.player_name))).fetch()
-
-        return StringMessages(message=[game.key.urlsafe()
-                                       for game in games])
+        if not User.query(User.name == request.player_name).get():
+            raise endpoints.ConflictException(
+                'No user named {} exists!'.format(request.player_name))
+        else:
+            games = Game.query(ndb.AND(Game.is_active == True,
+                                       ndb.OR(Game.player_1_name ==
+                                              request.player_name,
+                                              Game.player_2_name ==
+                                              request.player_name))).fetch()
+            return StringMessages(message=[game.key.urlsafe()
+                                           for game in games])
 
     @endpoints.method(request_message=GET_GAME_REQUEST,
                       response_message=StringMessage,
@@ -382,10 +398,10 @@ class LimitedRPSApi(remote.Service):
 
         game = get_by_urlsafe(request.game_key, Game)
         if not game:
-            raise endpoints.ConflictException('Cannot find game with key {}'.
+            raise endpoints.ConflictException('Cannot find game (key={})'.
                                               format(request.game_key))
         if not game.is_active:
-            raise endpoints.ConflictException('Game already inactive')
+            raise endpoints.ConflictException('This game is already finished')
 
         game.round = 9
         game.is_active = False
@@ -400,29 +416,35 @@ class LimitedRPSApi(remote.Service):
                       name='get_user_rankings',
                       http_method='POST')
     def get_user_rankings(self, request):
-        """Return list of Users in descending order of wins"""
-        users = User.query().order(-User.win).fetch()
+        """Return list of Users in descending order of winning rate"""
+        users = User.query().order(-User.winning_rate).fetch()
 
-        return StringMessages(message=['{} (win:{}, lose:{}, draw:{})'.
-                              format(user.name, user.win, user.lose,
-                                     user.draw) for user in users])
+        return StringMessages(message=['{} (Winning rate:{}, '
+                                       'win:{}, lose:{}, draw:{})'.
+                              format(user.name, user.winning_rate, user.win,
+                                     user.lose, user.draw) for user in users])
 
-    @endpoints.method(request_message=message_types.VoidMessage,
+    @endpoints.method(request_message=GET_GAME_REQUEST,
                       response_message=StringMessages,
-                      path='get_active_users',
-                      name='get_active_users',
+                      path='get_round_history',
+                      name='get_round_history',
                       http_method='GET')
-    def get_active_users(self, request):
-        """Return list of users with active games"""
-        users = User.query().fetch()
+    def get_round_history(self, request):
+        """Return list of Rounds plays in Game"""
 
-        active_users = []
-        for user in users:
-            if self.get_user_games(
-                    GET_USER_GAME_REQUEST.combined_message_class(
-                        player_name=user.name)).message:
-                active_users.append(user)
+        game = get_by_urlsafe(request.game_key, Game)
+        if not game:
+            raise endpoints.ConflictException('Cannot find game (key={})'.
+                                              format(request.game_key))
 
-        return StringMessages(message=[user.name for user in active_users])
+        moves = PlayerMoves.query(ancestor=game.key).order(PlayerMoves.round)
+
+        return StringMessages(message=[
+            'Round {}, {}:{}, {}:{}. {}'.format(move.round,
+                                                game.player_1_name,
+                                                move.player_1_move,
+                                                game.player_2_name,
+                                                move.player_2_move
+                                                ) for move in moves])
 
 api = endpoints.api_server([LimitedRPSApi])

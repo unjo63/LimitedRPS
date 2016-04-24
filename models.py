@@ -10,6 +10,8 @@ class User(ndb.Model):
     """User profile"""
     name = ndb.StringProperty(required=True)
     email = ndb.StringProperty(required=True)
+    winning_rate = ndb.FloatProperty()
+    # Rate of wining games per all finished games
     win = ndb.IntegerProperty()  # Number of win games
     lose = ndb.IntegerProperty()  # Number of lose games
     draw = ndb.IntegerProperty()  # Number of draw games
@@ -34,6 +36,12 @@ class Game(ndb.Model):
     player_2_move = ndb.StringProperty()  # rock or paper or scissors
     is_active = ndb.BooleanProperty()
     round_result = ndb.StringProperty()  # Result of round
+
+
+class PlayerMoves(ndb.Model):
+    player_1_move = ndb.StringProperty()
+    player_2_move = ndb.StringProperty()
+    round = ndb.IntegerProperty()
 
 
 class StringMessage(messages.Message):
