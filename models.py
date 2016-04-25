@@ -21,28 +21,38 @@ class Game(ndb.Model):
     """Game with players name and cards remain."""
     player_1_name = ndb.StringProperty(required=True)
     player_2_name = ndb.StringProperty(required=True)
-    player_1_rock = ndb.IntegerProperty()  # Number of P1's rock cards
-    player_1_paper = ndb.IntegerProperty()  # Number of P1's paper cards
-    player_1_scissors = ndb.IntegerProperty()  # Number of P1's scissors cards
-    player_2_rock = ndb.IntegerProperty()  # Number of P2's rock cards
-    player_2_paper = ndb.IntegerProperty()  # Number of P2's paper cards
-    player_2_scissors = ndb.IntegerProperty()  # Number of P2's scissors cards
+    player_1_rock = ndb.IntegerProperty()  # Number of Player1's rock cards
+    player_1_paper = ndb.IntegerProperty()  # Number of Player1's paper cards
+    player_1_scissors = ndb.IntegerProperty()
+    # Number of Player1's scissors cards
+    player_2_rock = ndb.IntegerProperty()  # Number of Player2's rock cards
+    player_2_paper = ndb.IntegerProperty()  # Number of Player2's paper cards
+    player_2_scissors = ndb.IntegerProperty()
+    # Number of Player2's scissors cards
     player_1_round_score = ndb.IntegerProperty()
-    # Number of rounds P1 wins in the game
+    # Number of rounds Player1 wins in the game
     player_2_round_score = ndb.IntegerProperty()
-    # Number of rounds P2 wins in the game
+    # Number of rounds Player2 wins in the game
     round = ndb.IntegerProperty()  # Number of played rounds in this game
     player_1_move = ndb.StringProperty()  # rock or paper or scissors
     player_2_move = ndb.StringProperty()  # rock or paper or scissors
     is_active = ndb.BooleanProperty()
+    # True corresponds to this game is active.
+    # False corresponds to this game was finished.
     round_result = ndb.StringProperty()  # Result of round
+
+
+class UserScores(ndb.Model):
+    """Record user scores with each games"""
+    player = ndb.StringProperty()  # Player name
+    score = ndb.IntegerProperty() # Number of winning round in game
 
 
 class PlayerMoves(ndb.Model):
     """Record player's move play in round"""
-    player_1_move = ndb.StringProperty()
-    player_2_move = ndb.StringProperty()
-    round = ndb.IntegerProperty()
+    player_1_move = ndb.StringProperty()  # Player_1's move
+    player_2_move = ndb.StringProperty()  # Player_2's move
+    round = ndb.IntegerProperty()  # Number of rounds played in the game
 
 
 class StringMessage(messages.Message):

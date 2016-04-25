@@ -93,7 +93,7 @@ This backend for an online two player Limited Rock Paper Scissors game has the f
     - Method: GET
     - Parameters: player_name
     - Returns: StringMessage containing list of active games for the user specified by name
-    - Description: *Play move in a Game.*
+    - Description: *Get all active Games for a User*
 
  - **cancel_game**
     - Path: 'cancel_game'
@@ -109,16 +109,16 @@ This backend for an online two player Limited Rock Paper Scissors game has the f
     - Returns: StringMessage containing list of Users in descending order of score
     - Description: *Return list of Users in descending order of score*
  
- - **get_round_history**
-    - Path: 'get_round_history'
+ - **get_game_history**
+    - Path: 'get_game_history'
     - Method: GET
     - Parameters: game_key
     - Returns: StringMessage containing list of move of every rounds plays in Game
     - Description: *Return list of moves play in Game*
     
- - **get_active_users**
-    - Path: 'get_active_users'
+ - **get_high_scores**
+    - Path: 'get_high_scores'
     - Method: GET
-    - Parameters: 
-    - Returns: StringMessage containing list of users with active games
-    - Description: *Return list of users with active games*
+    - Parameters: player_name
+    - Returns: StringMessage containing list of scores (Number of winning rounds in one game)
+    - Description: *Return list of high scores of the player*

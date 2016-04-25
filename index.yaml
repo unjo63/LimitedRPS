@@ -19,3 +19,8 @@ indexes:
   ancestor: yes
   properties:
   - name: round
+
+- kind: UserScores
+  properties:
+  - name: player
+  - name: score

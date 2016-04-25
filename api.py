@@ -9,7 +9,7 @@ from protorpc import remote, messages, message_types
 from google.appengine.api import oauth
 from google.appengine.ext import ndb
 
-from models import User, Game, PlayerMoves
+from models import User, Game, PlayerMoves, UserScores
 from models import StringMessage, StringMessages
 from utils import get_by_urlsafe
 
@@ -50,6 +50,7 @@ class LimitedRPSApi(remote.Service):
         scope = 'https://www.googleapis.com/auth/userinfo.email'
         oauth_user = oauth.get_current_user(scope)
 
+        # Check user name
         if User.query(User.name == request.user_name).get():
             raise endpoints.ConflictException(
                 'A User with that name already exists!')
@@ -120,6 +121,8 @@ class LimitedRPSApi(remote.Service):
         """Get a Game from its websafe key"""
 
         game = get_by_urlsafe(request.game_key, Game)
+
+        # check game key
         if not game:
             raise endpoints.ConflictException('Cannot find game with key {}'.
                                               format(request.game_key))
@@ -156,6 +159,7 @@ class LimitedRPSApi(remote.Service):
 
         # Verify inputs and game state
         game = get_by_urlsafe(request.game_key, Game)
+        game.round_result = None
         if not game:
             raise endpoints.ConflictException('Cannot find game with key {}'.
                                               format(request.game_key))
@@ -297,11 +301,12 @@ class LimitedRPSApi(remote.Service):
 
             game.round += 1
 
+            # record player's move history to PlayerMoves()
             move = PlayerMoves(parent=game.key,
                                player_1_move=game.player_1_move,
                                player_2_move=game.player_2_move,
                                round=game.round)
-            move_key = move.put()
+            move.put()
 
             game.player_1_move = None
             game.player_2_move = None
@@ -312,6 +317,17 @@ class LimitedRPSApi(remote.Service):
                 or (game.player_2_round_score > 4):
             game.is_active = False
             game.put()
+
+            # record user score to UserScores()
+            player_1_score = UserScores(parent=game.key,
+                                        player=game.player_1_name,
+                                        score=game.player_1_round_score)
+            player_2_score = UserScores(parent=game.key,
+                                        player=game.player_2_name,
+                                        score=game.player_2_round_score)
+            player_1_score.put()
+            player_2_score.put()
+
             if game.player_1_round_score != game.player_2_round_score:
                 # if not draw
                 if game.player_1_round_score > game.player_2_round_score:
@@ -374,6 +390,8 @@ class LimitedRPSApi(remote.Service):
                       http_method='GET')
     def get_user_games(self, request):
         """Get all active Games for a User"""
+
+        # check user name
         if not User.query(User.name == request.player_name).get():
             raise endpoints.ConflictException(
                 'No user named {} exists!'.format(request.player_name))
@@ -395,6 +413,8 @@ class LimitedRPSApi(remote.Service):
         """Cancel an active game"""
 
         game = get_by_urlsafe(request.game_key, Game)
+
+        # check game key
         if not game:
             raise endpoints.ConflictException('Cannot find game (key={})'.
                                               format(request.game_key))
@@ -424,13 +444,14 @@ class LimitedRPSApi(remote.Service):
 
     @endpoints.method(request_message=GET_GAME_REQUEST,
                       response_message=StringMessages,
-                      path='get_round_history',
-                      name='get_round_history',
+                      path='get_game_history',
+                      name='get_game_history',
                       http_method='GET')
-    def get_round_history(self, request):
+    def get_game_history(self, request):
         """Return list of moves play in Game"""
 
         game = get_by_urlsafe(request.game_key, Game)
+        # check game key
         if not game:
             raise endpoints.ConflictException('Cannot find game (key={})'.
                                               format(request.game_key))
@@ -444,5 +465,27 @@ class LimitedRPSApi(remote.Service):
                                              game.player_2_name,
                                              move.player_2_move
                                              ) for move in moves])
+
+    @endpoints.method(request_message=GET_USER_GAME_REQUEST,
+                      response_message=StringMessages,
+                      path='get_high_scores',
+                      name='get_high_scores',
+                      http_method='GET')
+    def get_high_scores(self, request):
+        """Return list of high scores of the player """
+
+        scores = UserScores.query(UserScores.player ==
+                                  request.player_name).\
+            order(UserScores.score).fetch()
+
+        # check user played games
+        if not scores:
+            raise endpoints.ConflictException(
+                '{} have not finished game yet.'.format(request.player_name))
+        else:
+            return StringMessages(message=['Win {} rounds in game (key={})'.
+                                  format(score.score,
+                                         score.key.parent().urlsafe())
+                                           for score in scores])
 
 api = endpoints.api_server([LimitedRPSApi])

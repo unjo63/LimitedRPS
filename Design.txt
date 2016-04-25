@@ -24,9 +24,14 @@ Design of LimitedRPS
         player_2_scissors = ndb.IntegerProperty()  # Number of Player_2's scissors cards
 
     I also added PlayerMove() model, which is recorded player's move plays in every rounds. PlayerMove() contains fallowing properties, which is listed get_round_history() endpoint.
-        player_1_move = ndb.StringProperty()
-        player_2_move = ndb.StringProperty()
-        round = ndb.IntegerProperty()
+        player_1_move = ndb.StringProperty()  # Player_1's move
+        player_2_move = ndb.StringProperty()  # Player_2's move
+        round = ndb.IntegerProperty()  # Number of rounds played in the game
+
+    I also added UserScores() model, which is record player's scores in every games.
+        The score is the number of winning rounds in one game. get_high_scores endpoint lists the user scores by using UserScores() class.
+        But when playing LimitedRPS, this score is meaningless because player will lost some rounds strategically.
+        So this function is for the purpose of Task 3: Extend Your API.
 
 2. What were some of the trade-offs or struggles you faced when implementing the new game logic?
 
